@@ -6,6 +6,7 @@
  */
 Injector = function()
 {
+    this._mappedValues = {};
 };
 
 /**
@@ -47,8 +48,6 @@ Injector.prototype.apply = function(value)
     }
 };
 
-Injector.prototype._mappedValues = {};
-
 /**
  * inject() is a global function that can be called by any object.
  * Injections will not be resolved on inject(), but will be resolved
@@ -56,7 +55,7 @@ Injector.prototype._mappedValues = {};
  */
 inject = function(identifier)
 {
-    return {into: function into(owner,field)
+    return {into: function(owner,field)
     {
         if(!owner.__injections__) owner.__injections__ = {};
 
