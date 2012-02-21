@@ -4,7 +4,7 @@ Imbue provides an easy to use an highly flexible dependency injection container 
 
 To get started with Imbue, read through our **examples**:
 
-1. imbue-basics
+1. [imbue-basics](http://leedostudios.github.com/imbue.js/docs/imbue-basics.html)
 2. imbue-propertys
 3. imbue-dual-injection
 4. imbue-parent-injectors
