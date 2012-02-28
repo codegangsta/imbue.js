@@ -1,3 +1,7 @@
+// Global namespace introductions
+var Injector, inject;
+
+(function (undefined) {
 /**
  * Injector is a simple dependency injection container that
  * allows scoping and parent injection to be applied to
@@ -102,3 +106,4 @@ inject = function(identifiers, Constructor)
          return Object(ret) === ret ? ret : inst;
     };
 }
+})()
