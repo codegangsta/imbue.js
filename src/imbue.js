@@ -1,3 +1,7 @@
+// Global namespace introductions
+var Injector, inject;
+
+(function (undefined) {
 /**
  * Injector is a simple dependency injection container that
  * allows scoping and parent injection to be applied to
@@ -35,17 +39,20 @@ Injector.prototype.apply = function(value)
         for(var field in requests)
         {
             var id = requests[field];
-
-            if(this._mappedValues[id])
-            {
-                value[field] = this._mappedValues[id]
-            }
-            else
-            {
-                throw "The mapping for '" + id + "' is not found on this injector";
-            }
+            value[field] = this.get(id);
         }
     }
+};
+
+Injector.prototype.has = function (id) {
+    return this._mappedValues.hasOwnProperty(id);
+};
+
+Injector.prototype.get = function (id) {
+    if (!this.has(id))
+        throw "The mapping for '" + id + "' is not found on this injector";
+
+    return this._mappedValues[id];
 };
 
 /**
@@ -53,15 +60,50 @@ Injector.prototype.apply = function(value)
  * Injections will not be resolved on inject(), but will be resolved
  * when Injector.apply() is called on the object.
  */
-inject = function(identifier)
+inject = function(identifiers, Constructor)
 {
-    return {into: function(owner,field)
-    {
-        if(!owner.__injections__) owner.__injections__ = {};
+    if (typeof identifiers !== 'array')
+        identifiers = [identifiers];
 
-        if(field)
-            owner.__injections__[field] = identifier;
-        else
-            owner.__injections__[identifier] = identifier;
-    }};
+    // If there was no constructor provided, then we are in the inject(...).into(...) state
+    if (!Constructor || (typeof Constructor !== 'function'))
+    {
+        return {into: function(owner, fields)
+            {
+                var property;
+
+                if (typeof fields !== 'array')
+                    fields = [fields];
+
+                owner.__injections__ = owner.__injections__ || {};
+
+                for(var item in identifiers) {
+                    property = fields[item] || identifiers[item];
+                    owner.__injections__[property] = identifiers[item];
+                }
+            }};
+    }
+
+    // Otherwise we're in the constructor injection business
+    return function (injector) {
+        var Temp = function(){}
+          , args = Array.prototype.slice.apply(arguments)
+          , injections = []
+          , inst
+          , ret;
+
+         Temp.prototype = constructor.prototype;
+         inst = new Temp();
+
+         // Remove the injector from the args list
+         args.shift;
+         for (var id in identifiers) {
+             injections.push(injector.get(identifiers[id]));
+         }
+         args.unshift.apply(args, injections);
+
+         ret = Constructor.apply(inst, args);
+         return Object(ret) === ret ? ret : inst;
+    };
 }
+})()
