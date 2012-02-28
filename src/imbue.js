@@ -39,7 +39,7 @@ Injector.prototype.apply = function(value)
         for(var field in requests)
         {
             var id = requests[field];
-            value[field] = this.retrieve(id);
+            value[field] = this.get(id);
         }
     }
 };
@@ -48,7 +48,7 @@ Injector.prototype.has = function (id) {
     return this._mappedValues.hasOwnProperty(id);
 };
 
-Injector.prototype.retrieve = function (id) {
+Injector.prototype.get = function (id) {
     if (!this.has(id))
         throw "The mapping for '" + id + "' is not found on this injector";
 
@@ -98,7 +98,7 @@ inject = function(identifiers, Constructor)
          // Remove the injector from the args list
          args.shift;
          for (var id in identifiers) {
-             injections.push(injector.retrieve(identifiers[id]));
+             injections.push(injector.get(identifiers[id]));
          }
          args.unshift.apply(args, injections);
 
